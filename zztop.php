@@ -55,19 +55,19 @@ class Zztop extends Module implements WidgetInterface{
         );
     }
 
-    public function renderWidget($hookName, array $configuration){
-        $templateVars = $this->getWidgetVariables($hookName, $configuration);
-        $this->smarty->assign($templateVars);
-        return $this->fetch($this->templateFile);
-    } 
-
-    public function getWidgetVariables($hookName, array $configuration){//Fait la passerelle pour utiliser les variables dans le template
+    public function getWidgetVariables($hookName, array $configuration){//Récupère les variables sur la BDD pour les utiliser dans renderWidget
         return [
             'title' => Configuration::get('ZZTOP_TITLE'),
             'subtitle' => Configuration::get('ZZTOP_SUBTITLE'),
             'description' => '<h2>Une description</h2>'
         ];
     }
+
+    public function renderWidget($hookName, array $configuration){//Envoie les variables récupérées par getWidgetVariables dans le template
+        $templateVars = $this->getWidgetVariables($hookName, $configuration);
+        $this->smarty->assign($templateVars);
+        return $this->fetch($this->templateFile);
+    } 
 
     public function getContent(){ //son rôle est de rajouter un bouton configurer pour accéder à un formulaire pour paramétrer le module
         $output = $this->post_validate();
@@ -134,7 +134,7 @@ class Zztop extends Module implements WidgetInterface{
         $helper->default_form_language = $lang->id;
         $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') ? Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') : 0;
         $helper->identifier = $this->identifier;
-        $helper->submit_action = 'submitZZ';
+        $helper->submit_action = 'submitZZ';//Important => donner un nom au submit_action
         $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false) . '&configure=' . $this->name . '&tab_module=' . $this->tab . '&module_name=' . $this->name;
         $helper->token = Tools::getAdminTokenLite('AdminModules');
         $helper->tpl_vars = [
