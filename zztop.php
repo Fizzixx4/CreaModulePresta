@@ -26,7 +26,7 @@ class Zztop extends Module implements WidgetInterface{
         return parent::install()
         && $this->registerHook('displayHome')
         && $this->registerHook('header')//permet de rajouter des fichiers js ou css
-        && Configuration::updateValue('ZZTOP_TITLE', 'Titre')//check si dans la table configuration un  ZZTOP_TITLE existe. Si il existe il le met à jour sinion il le crée
+        && Configuration::updateValue('ZZTOP_TITLE', 'Titre')//check si dans la table configuration un  ZZTOP_TITLE existe. Si il existe il le met à jour sinon il le crée
         && Configuration::updateValue('ZZTOP_SUBTITLE', 'Sous-titre')
         && Configuration::updateValue('ZZTOP_DESCRIPTION', 'Description');
     }
@@ -57,10 +57,26 @@ class Zztop extends Module implements WidgetInterface{
     }
 
     public function getWidgetVariables($hookName, array $configuration){//Récupère les variables sur la BDD pour les utiliser dans renderWidget
+        // $sql = "select * from  "._DB_PREFIX_."product";
+        // $products = Db::getInstance()->executeS($sql);//retourne un tableau du résultat de la reqûete
+        // foreach ($products as $product){
+        //     $product = new Product($product['id_product']);//on les crée en objet par rapport à ce que la requête nous a donné
+        //     $product->description_short[1] = 'vide'; //le 1 est l'id de la langue
+        //     $product->save();
+        // }
+        // $product = new Product();
+        // $product->reference = 'RefNew';
+        // $product->id_category_default = 2;
+        // $product->description_short[1] = 'Nouveau produit';
+        // $product->price = 15;
+        // $product->active = 1;
+        // $product->save();
         return [
             'title' => Configuration::get('ZZTOP_TITLE'),
             'subtitle' => Configuration::get('ZZTOP_SUBTITLE'),
-            'description' => Configuration::get('ZZTOP_DESCRIPTION')
+            'description' => Configuration::get('ZZTOP_DESCRIPTION'),
+            //'products' => $products
+            'link' => Context::getContext()->link->getModuleLink('zztop','pagezz')
         ];
     }
 

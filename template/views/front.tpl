@@ -2,3 +2,4 @@
 {$title}<br>
 {$subtitle}<br>
 {$description nofilter}
+<a href = '{$link}'>Lien vers le module</a>
