@@ -26,8 +26,9 @@ class Zztop extends Module implements WidgetInterface{
         return parent::install()
         && $this->registerHook('displayHome')
         && $this->registerHook('header')//permet de rajouter des fichiers js ou css
-        && Configuration::updateValue('ZZTOP_TITLE', 'Bienvenue')//check si dans la table configuration un  ZZTOP_TITLE existe. Si il existe il le met à jour sinion il le crée
-        && Configuration::updateValue('ZZTOP_SUBTITLE', 'Bienvenue');
+        && Configuration::updateValue('ZZTOP_TITLE', 'Titre')//check si dans la table configuration un  ZZTOP_TITLE existe. Si il existe il le met à jour sinion il le crée
+        && Configuration::updateValue('ZZTOP_SUBTITLE', 'Sous-titre')
+        && Configuration::updateValue('ZZTOP_DESCRIPTION', 'Description');
     }
 
     public function uninstall(){
@@ -59,7 +60,7 @@ class Zztop extends Module implements WidgetInterface{
         return [
             'title' => Configuration::get('ZZTOP_TITLE'),
             'subtitle' => Configuration::get('ZZTOP_SUBTITLE'),
-            'description' => '<h2>Une description</h2>'
+            'description' => Configuration::get('ZZTOP_DESCRIPTION')
         ];
     }
 
@@ -78,13 +79,17 @@ class Zztop extends Module implements WidgetInterface{
         $output = '';
         $errors = [];
         if(Tools::isSubmit('submitZZ')){//Check si le formulaire a été submit
-            $title = Tools::getValue('zztitle');//récupère la valeur du champ
+            $title = Tools::getValue('zztitle');//récupère la valeur du champ du formulaire, de manière générale la fonction va chercher la valeur par rapport à la clé en paramètre dans le $_GET ou $_POST
             $subtitle = Tools::getValue('zzsubtitle');
+            $description = Tools::getValue('zzdescription');
             if($title === ''){
                 $errors[] = 'Le champs title est obligatoire';
             }
             if($subtitle === ''){
                 $errors[] = 'Le champs subtitle est obligatoire';
+            }
+            if($description === ''){
+                $errors[] = 'Le champs description est obligatoire';
             }
             if(count($errors) > 0){
                 $output = $this->displayError(implode('<br>',$errors));//Affiche un message d'erreur
@@ -92,6 +97,7 @@ class Zztop extends Module implements WidgetInterface{
             else{
                 Configuration::updateValue('ZZTOP_TITLE',$title);//l'envoie en BDD
                 Configuration::updateValue('ZZTOP_SUBTITLE',$subtitle);
+                Configuration::updateValue('ZZTOP_DESCRIPTION',$description,true);
                 $output = $this->displayConfirmation('Le formulaire est enregistré');//Affiche un message de confirmation
             }
         }
@@ -117,6 +123,16 @@ class Zztop extends Module implements WidgetInterface{
                         'type' => 'text',
                         'name' =>'zzsubtitle',
                         'label' => $this->trans('Sub Title', [], 'Modules.Zztop.Admin'),
+                        'required' => 1
+                    ],
+                    [
+                        'type' => 'textarea',
+                        'label' => $this->trans('Text block', [], 'Modules.Customtext.Admin'),
+                        'name' => 'zzdescription',
+                        'cols' => 40,
+                        'rows' => 10,
+                        'class' => 'rte',
+                        'autoload_rte' => true,
                         'required' => 1
                     ]
                 ],
@@ -149,7 +165,8 @@ class Zztop extends Module implements WidgetInterface{
     private function getConfigFieldsValue(){//Va chercher les valeurs de config sur la BDD
         return [
             'zztitle' => Tools::getValue('zztitle', Configuration::get('ZZTOP_TITLE')),
-            'zzsubtitle' => Tools::getValue('zzsubtitle',Configuration ::get('ZZTOP_SUBTITLE'))
+            'zzsubtitle' => Tools::getValue('zzsubtitle',Configuration ::get('ZZTOP_SUBTITLE')),
+            'zzdescription' => Tools::getValue('zzdescription',Configuration ::get('ZZTOP_DESCRIPTION'))
         ];
     }
 }
